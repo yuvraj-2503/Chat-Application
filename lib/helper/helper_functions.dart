@@ -35,4 +35,9 @@ class HelperFunctions{
     SharedPreferences preferences = await SharedPreferences.getInstance();
     return preferences.getString(sharedPreferencesUserEmailKey);
   }
+
+  static Future<bool> deleteSharedPreferencesData() async{
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    return preferences.clear();
+  }
 }

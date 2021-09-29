@@ -11,7 +11,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'chat_room.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  final Function toggleView;
+  const LoginScreen(this.toggleView,{Key? key}) : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -48,9 +49,9 @@ class _LoginScreenState extends State<LoginScreen> {
               builder: (context) { return const ChatRoom(); }
           ));
         }else{
-          Navigator.pushReplacement(context, MaterialPageRoute(
-              builder: (context) { return const LoginScreen(); }
-          ));
+          setState(() {
+            isLoading = false;
+          });
         }
       });
     }
@@ -143,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   GestureDetector(
                     onTap: (){
                       Navigator.pushReplacement(context, MaterialPageRoute(
-                        builder: (context){return const SignUpScreen();},
+                        builder: (context) => SignUpScreen(widget.toggleView)
                       ));
                     },
                     child: const Text('Sign Up', style: TextStyle(

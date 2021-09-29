@@ -1,9 +1,14 @@
+import 'package:chat_application/helper/authenticate.dart';
 import 'package:chat_application/helper/constants.dart';
 import 'package:chat_application/helper/helper_functions.dart';
+import 'package:chat_application/screens/chat.dart';
 import 'package:chat_application/screens/search.dart';
 import 'package:chat_application/services/auth.dart';
+import 'package:chat_application/services/database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'login_screen.dart';
 
 class ChatRoom extends StatefulWidget {
@@ -15,6 +20,8 @@ class ChatRoom extends StatefulWidget {
 
 class _ChatRoomState extends State<ChatRoom> {
   Auth auth= Auth();
+  Database db= Database();
+  Stream<QuerySnapshot>? chatRooms;
 
   @override
   void initState() {
@@ -22,9 +29,38 @@ class _ChatRoomState extends State<ChatRoom> {
     super.initState();
   }
 
+  getChatRooms() async{
+    await db.getChatRooms(currentLoggedInUser).then((value) {
+      setState(() {
+        chatRooms = value;
+      });
+    });
+    print(chatRooms);
+  }
+
+  Widget chatList(){
+    return StreamBuilder<QuerySnapshot>(
+      stream: chatRooms,
+      builder: (context, snapshot){
+        return (snapshot.hasData && snapshot.data != null) ?
+        ListView.builder(
+          itemCount: snapshot.data!.docs.length,
+          itemBuilder: (context, index){
+            return ChatRoomTile(
+              username: snapshot.data!.docs[index].get("chatroom_id")
+              .toString().replaceAll(currentLoggedInUser, "").replaceAll("_", ""),
+              chatRoomId: snapshot.data!.docs[index].get("chatroom_id"),
+            );
+          },
+        ) : Container();
+      },
+    );
+  }
+
   getCurrentLoggedInUser() async{
     currentLoggedInUser = await HelperFunctions.getUsernameSharedPreferences();
-    print(currentLoggedInUser);
+    currentLoggedInUserEmail = await HelperFunctions.getUserEmailSharedPreferences();
+    getChatRooms();
   }
 
   @override
@@ -38,9 +74,13 @@ class _ChatRoomState extends State<ChatRoom> {
           GestureDetector(
             onTap: (){
               auth.signOut();
-              Navigator.pushReplacement(context, MaterialPageRoute(
-                  builder: (context) { return const LoginScreen(); }
-              ));
+              HelperFunctions.deleteSharedPreferencesData().then((value) {
+                if(value){
+                  Navigator.pushReplacement(context, MaterialPageRoute(
+                      builder: (context) => const Authenticate()
+                  ));
+                }
+              });
             },
             child: Container(
                 child: const Icon(Icons.exit_to_app,),
@@ -49,6 +89,7 @@ class _ChatRoomState extends State<ChatRoom> {
           )
         ],
       ),
+      body: chatList(),
       floatingActionButton: FloatingActionButton(
         onPressed: (){
           Navigator.push(context, MaterialPageRoute(
@@ -57,6 +98,53 @@ class _ChatRoomState extends State<ChatRoom> {
         },
         child: const Icon(Icons.search),
         backgroundColor: primaryColor,
+      ),
+    );
+  }
+}
+
+class ChatRoomTile extends StatelessWidget {
+  final String username;
+  final String chatRoomId;
+  const ChatRoomTile({required this.chatRoomId , required this.username,Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: (){
+        Navigator.push(context, MaterialPageRoute(
+          builder: (context) => Conversation(
+            chatroomId: chatRoomId,
+          )
+        ));
+      },
+      child: Container(
+        decoration: BoxDecoration(
+            color: Colors.black26,
+          border: Border.all(color: Colors.white54)
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(40),
+                color: Colors.blue
+              ),
+              child: Text('${username.substring(0,1).toUpperCase()}', style: TextStyle(
+                color: Colors.white
+              ),),
+            ),
+            SizedBox(width: 16,),
+            Text(username, style: TextStyle(
+              color: Colors.white,
+              fontSize: 17
+            ),)
+          ],
+        ),
       ),
     );
   }

@@ -54,7 +54,9 @@ class _SearchScreenState extends State<SearchScreen> {
     };
     db.createChatRoom(chatRoomId, usersMap);
     Navigator.pushReplacement(context, MaterialPageRoute(
-      builder: (context) => const Conversation()
+      builder: (context) => Conversation(
+        chatroomId: chatRoomId,
+      )
     ));
   }
 

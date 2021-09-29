@@ -2,7 +2,7 @@
     package="com.example.chat_application">
    <application
         android:usesCleartextTraffic="true"
-        android:label="chat_application"
+        android:label="Flutter Connect"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

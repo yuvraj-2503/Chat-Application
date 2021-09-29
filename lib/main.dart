@@ -1,3 +1,4 @@
+import 'package:chat_application/helper/authenticate.dart';
 import 'package:chat_application/helper/constants.dart';
 import 'package:chat_application/helper/helper_functions.dart';
 import 'package:chat_application/screens/chat_room.dart';
@@ -6,13 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 void main() async{
-  init();
-  runApp(const MyApp());
-}
-
-void init() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -34,7 +31,7 @@ class _MyAppState extends State<MyApp> {
   getLoggedInUser() async{
     await HelperFunctions.getUserLoggedInSharedPreferences().then((value) {
       setState(() {
-        userIsLoggedIn = value;
+          userIsLoggedIn = value;
       });
     });
   }
@@ -48,8 +45,8 @@ class _MyAppState extends State<MyApp> {
         primaryColor: primaryColor,
         scaffoldBackgroundColor: scaffoldBackground,
       ),
-      home: userIsLoggedIn != null ? (userIsLoggedIn! ? const ChatRoom() : const WelcomeScreen())
-        : const WelcomeScreen(),
+      home: userIsLoggedIn!=null ? userIsLoggedIn! ? const ChatRoom() : const Authenticate()
+        : const Authenticate(),
     );
   }
 }

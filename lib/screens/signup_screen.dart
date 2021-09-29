@@ -9,7 +9,8 @@ import 'package:flutter/material.dart';
 import 'login_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
-  const SignUpScreen ({Key? key}) : super(key: key);
+  final Function toggleView;
+  const SignUpScreen (this.toggleView ,{Key? key}) : super(key: key);
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -49,9 +50,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
               builder: (context) { return const ChatRoom(); }
           ));
         }else{
-          Navigator.pushReplacement(context, MaterialPageRoute(
-              builder: (context) { return const SignUpScreen(); }
-          ));
+          setState(() {
+            isLoading = false;
+          });
         }
       });
     }
@@ -165,7 +166,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   GestureDetector(
                     onTap: (){
                       Navigator.pushReplacement(context, MaterialPageRoute(
-                        builder: (context){return const LoginScreen();},
+                          builder: (context) => LoginScreen(widget.toggleView)
                       ));
                     },
                     child: const Text('Login', style: TextStyle(
