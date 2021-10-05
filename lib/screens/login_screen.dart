@@ -57,6 +57,12 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  signInWithGoogle() async{
+    await auth.signInWithGoogle().then((value) {
+      Fluttertoast.showToast(msg: "${value.uid}");
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size= MediaQuery.of(context).size;
@@ -156,6 +162,33 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
               SizedBox(height: size.height * 0.03,),
+
+              GestureDetector(
+                onTap: signInWithGoogle,
+                child: Container(
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                  margin: const EdgeInsets.symmetric(vertical: 20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    color: Colors.white,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image.asset('assets/images/google.png', width: 24,height: 24,),
+                      SizedBox(width: size.width * 0.04,),
+                      Text("LOGIN WITH GOOGLE", style: TextStyle(
+                          color: primaryColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18
+                      ),)
+                    ],
+                  ),
+                ),
+              )
             ],
           ),
         ),

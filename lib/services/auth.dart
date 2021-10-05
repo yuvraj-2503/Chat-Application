@@ -3,11 +3,29 @@ import 'package:chat_application/models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class Auth{
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
   UserModel? _userFromFirebase(User? user){
     return user != null ? UserModel(userId: user.uid) : null;
+  }
+
+  Future signInWithGoogle() async{
+    try {
+      final GoogleSignInAccount? googleSignInAccount = await _googleSignIn.signIn();
+      final GoogleSignInAuthentication googleSignInAuthentication= await googleSignInAccount!.authentication;
+      final AuthCredential authCredential= GoogleAuthProvider.credential(
+        accessToken: googleSignInAuthentication.accessToken,
+        idToken: googleSignInAuthentication.idToken
+      );
+      return await _auth.signInWithCredential(authCredential);
+    } on Exception catch (e) {
+      // TODO
+      Fluttertoast.showToast(msg: "$e", toastLength: Toast.LENGTH_LONG);
+    }
+
   }
 
   Future signInWithEmailAndPassword(String email, String password) async{
