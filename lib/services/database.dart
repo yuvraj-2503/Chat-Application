@@ -5,7 +5,8 @@ class Database{
   final FirebaseFirestore _database= FirebaseFirestore.instance;
   Future getUserByUsername(String username) async{
     return await _database.collection('users')
-        .where('username', isEqualTo: username, isNotEqualTo: currentLoggedInUser).get();
+        .where('username', isEqualTo: username,
+          isNotEqualTo: currentLoggedInUser!.displayName.toString()).get();
   }
 
   Future getUserByUserEmail(String userEmail) async{
@@ -13,7 +14,7 @@ class Database{
         .where('email', isEqualTo: userEmail).get();
   }
 
-  Future saveUserData(userData) async{
+  Future saveUserData(Map<String, dynamic> userData) async{
     await _database.collection('users').add(userData);
   }
 
@@ -38,7 +39,7 @@ class Database{
     return snapshot;
   }
 
-  Future getChatRooms(String username) async{
+  Future getChatRooms(String? username) async{
     return await FirebaseFirestore.instance.collection('chatrooms')
         .where('users', arrayContains: username)
         .snapshots();

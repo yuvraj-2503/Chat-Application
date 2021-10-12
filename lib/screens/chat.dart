@@ -26,7 +26,7 @@ class _ConversationState extends State<Conversation> {
           itemBuilder: (context, index){
             return MessageTile(
               message: snapshot.data!.docs[index].get("message"),
-              isSentByMe: snapshot.data!.docs[index].get("sentBy")== currentLoggedInUser,
+              isSentByMe: snapshot.data!.docs[index].get("sentBy")== currentLoggedInUser!.displayName,
             );
           },
         ) : Container();
@@ -38,7 +38,7 @@ class _ConversationState extends State<Conversation> {
     if(sendTextEditingController.text.isNotEmpty){
       Map<String, dynamic> messageMap= {
         "message": sendTextEditingController.text.trim(),
-        "sentBy": currentLoggedInUser,
+        "sentBy": currentLoggedInUser!.displayName,
         "timestamp": DateTime.now().millisecondsSinceEpoch,
       };
       db.sendMessages(widget.chatroomId, messageMap);

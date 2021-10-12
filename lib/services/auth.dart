@@ -1,18 +1,13 @@
 
-import 'package:chat_application/models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class Auth{
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  User? _user;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
-  UserModel? _userFromFirebase(User? user){
-    return user != null ? UserModel(userId: user.uid) : null;
-  }
 
-  Future signInWithGoogle() async{
+  Future<User?> signInWithGoogle() async{
     try {
       final GoogleSignInAccount? googleSignInAccount = await _googleSignIn.signIn();
       final GoogleSignInAuthentication googleSignInAuthentication= await googleSignInAccount!.authentication;
@@ -20,38 +15,38 @@ class Auth{
         accessToken: googleSignInAuthentication.accessToken,
         idToken: googleSignInAuthentication.idToken
       );
-      return await _auth.signInWithCredential(authCredential);
-    } on Exception catch (e) {
+      final UserCredential userCredential = await _auth.signInWithCredential(authCredential);
+      _user = userCredential.user;
+      return _user;
+    }catch (e) {
       // TODO
-      Fluttertoast.showToast(msg: "$e", toastLength: Toast.LENGTH_LONG);
+      print(e);
     }
 
   }
 
-  Future signInWithEmailAndPassword(String email, String password) async{
+  Future<User?> signInWithEmailAndPassword(String email, String password) async{
     try{
-      var result = await _auth.signInWithEmailAndPassword(
+      UserCredential result = await _auth.signInWithEmailAndPassword(
           email: email,
           password: password
       );
-      var user = result.user;
-      return _userFromFirebase(user);
+      _user = result.user;
+      return _user;
     }catch(e){
-      Fluttertoast.showToast(msg: e.toString());
-      return null;
+      print(e);
     }
   }
 
-  Future signUpWithEmailAndPassword(String email, String password) async{
+  Future<User?> signUpWithEmailAndPassword(String email, String password) async{
     try{
-      var result = await _auth.createUserWithEmailAndPassword(
+      UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password
       );
-      var user = result.user;
-      return _userFromFirebase(user);
+      _user = result.user;
+      return _user;
     }catch(e){
-      Fluttertoast.showToast(msg: e.toString(),backgroundColor: Colors.white, textColor: Colors.black);
-      return null;
+      print(e);
     }
   }
 
@@ -65,7 +60,8 @@ class Auth{
 
   Future signOut() async{
     try{
-      return await _auth.signOut();
+      await _googleSignIn.signOut();
+      await _auth.signOut();
     }catch(e){
       print(e);
     }

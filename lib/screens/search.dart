@@ -46,8 +46,8 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   createChatRoom(String username){
-    List<String> users= [username, currentLoggedInUser];
-    String chatRoomId = getChatRoomId(currentLoggedInUser, username);
+    List<String> users= [username, currentLoggedInUser!.displayName.toString()];
+    String chatRoomId = getChatRoomId(currentLoggedInUser!.displayName.toString(), username);
     Map<String, dynamic> usersMap= {
       "chatroom_id": chatRoomId,
       "users" : users,
@@ -126,21 +126,26 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget userTile({required String username, required String userEmail}){
+    Size size = MediaQuery.of(context).size;
     return Container(
+      width: size.width,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Row(
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(username, style: const TextStyle(
-                  color: Colors.white, fontSize: 16
-              ),),
-              const SizedBox(height: 6,),
-              Text(userEmail, style: const TextStyle(
-                  color: Colors.white, fontSize: 16
-              ),),
-            ],
+          Container(
+            width: size.width * 0.5,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(username, style: const TextStyle(
+                    color: Colors.white, fontSize: 16
+                ),),
+                const SizedBox(height: 6,),
+                Text(userEmail, style: const TextStyle(
+                    color: Colors.white, fontSize: 16
+                ),),
+              ],
+            ),
           ),
           const Spacer(),
           GestureDetector(
@@ -148,6 +153,7 @@ class _SearchScreenState extends State<SearchScreen> {
               createChatRoom(username);
             },
             child: Container(
+              width: size.width * 0.3,
               decoration: BoxDecoration(
                   color: primaryColor,
                   borderRadius: BorderRadius.circular(24)

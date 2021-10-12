@@ -1,13 +1,10 @@
 import 'package:chat_application/helper/constants.dart';
-import 'package:chat_application/helper/helper_functions.dart';
 import 'package:chat_application/screens/signup_screen.dart';
 import 'package:chat_application/services/auth.dart';
 import 'package:chat_application/services/database.dart';
 import 'package:chat_application/widgets/widget.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'chat_room.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -26,7 +23,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final formKey = GlobalKey<FormState>();
   TextEditingController emailTextEditingController = TextEditingController();
   TextEditingController passwordTextEditingController = TextEditingController();
-  late QuerySnapshot snapshot;
 
   login() async{
     if(formKey.currentState!.validate()){
@@ -37,14 +33,6 @@ class _LoginScreenState extends State<LoginScreen> {
       });
       await auth.signInWithEmailAndPassword(email, password).then((user) async{
         if(user != null){
-          HelperFunctions.saveUserLoggedInSharedPreferences(true);
-          await db.getUserByUserEmail(email.toString())
-          .then((val){
-            snapshot = val;
-          });
-          // print(snapshot);
-          HelperFunctions.saveUsernameSharedPreferences(snapshot.docs[0].get('username'));
-          HelperFunctions.saveUserEmailSharedPreferences(email);
           Navigator.pushReplacement(context, MaterialPageRoute(
               builder: (context) { return const ChatRoom(); }
           ));
@@ -58,8 +46,10 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   signInWithGoogle() async{
-    await auth.signInWithGoogle().then((value) {
-      Fluttertoast.showToast(msg: "${value.uid}");
+    await auth.signInWithGoogle().then((user) {
+      Navigator.pushReplacement(context, MaterialPageRoute(
+        builder: (context) => const ChatRoom()
+      ));
     });
   }
 

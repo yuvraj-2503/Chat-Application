@@ -1,5 +1,4 @@
 import 'package:chat_application/helper/constants.dart';
-import 'package:chat_application/helper/helper_functions.dart';
 import 'package:chat_application/screens/chat_room.dart';
 import 'package:chat_application/services/auth.dart';
 import 'package:chat_application/services/database.dart';
@@ -43,9 +42,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         // print("${user.userId}");
         if(user!=null){
           database.saveUserData(userData);
-          HelperFunctions.saveUserLoggedInSharedPreferences(true);
-          HelperFunctions.saveUsernameSharedPreferences(username);
-          HelperFunctions.saveUserEmailSharedPreferences(email);
+          user.updateDisplayName(username);
           Navigator.pushReplacement(context, MaterialPageRoute(
               builder: (context) { return const ChatRoom(); }
           ));
@@ -56,6 +53,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
         }
       });
     }
+  }
+
+  signUpWithGoogle() async{
+    await auth.signInWithGoogle().then((user) {
+      Map<String, dynamic> userData = {
+        "email" : user!.email,
+        "username" : user.displayName
+      };
+      database.saveUserData(userData);
+      Navigator.pushReplacement(context, MaterialPageRoute(
+          builder: (context) => const ChatRoom()
+      ));
+    });
   }
 
   @override
@@ -177,6 +187,34 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   )
                 ],
               ),
+              SizedBox(height: size.height * 0.03,),
+
+              GestureDetector(
+                onTap: signUpWithGoogle,
+                child: Container(
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                  margin: const EdgeInsets.symmetric(vertical: 20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    color: Colors.white,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image.asset('assets/images/google.png', width: 24,height: 24,),
+                      SizedBox(width: size.width * 0.04,),
+                      Text("SIGNUP WITH GOOGLE", style: TextStyle(
+                          color: primaryColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18
+                      ),)
+                    ],
+                  ),
+                ),
+              )
             ],
           ),
         ),

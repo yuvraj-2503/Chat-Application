@@ -1,15 +1,13 @@
 import 'package:chat_application/helper/authenticate.dart';
 import 'package:chat_application/helper/constants.dart';
-import 'package:chat_application/helper/helper_functions.dart';
 import 'package:chat_application/screens/chat.dart';
 import 'package:chat_application/screens/search.dart';
 import 'package:chat_application/services/auth.dart';
 import 'package:chat_application/services/database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'login_screen.dart';
 
 class ChatRoom extends StatefulWidget {
   const ChatRoom({Key? key}) : super(key: key);
@@ -30,7 +28,7 @@ class _ChatRoomState extends State<ChatRoom> {
   }
 
   getChatRooms() async{
-    await db.getChatRooms(currentLoggedInUser).then((value) {
+    await db.getChatRooms(currentLoggedInUser!.displayName).then((value) {
       setState(() {
         chatRooms = value;
       });
@@ -48,7 +46,7 @@ class _ChatRoomState extends State<ChatRoom> {
           itemBuilder: (context, index){
             return ChatRoomTile(
               username: snapshot.data!.docs[index].get("chatroom_id")
-              .toString().replaceAll(currentLoggedInUser, "").replaceAll("_", ""),
+              .toString().replaceAll(currentLoggedInUser!.displayName.toString(), "").replaceAll("_", ""),
               chatRoomId: snapshot.data!.docs[index].get("chatroom_id"),
             );
           },
@@ -58,8 +56,8 @@ class _ChatRoomState extends State<ChatRoom> {
   }
 
   getCurrentLoggedInUser() async{
-    currentLoggedInUser = await HelperFunctions.getUsernameSharedPreferences();
-    currentLoggedInUserEmail = await HelperFunctions.getUserEmailSharedPreferences();
+    currentLoggedInUser = await FirebaseAuth.instance.currentUser;
+    print(currentLoggedInUser);
     getChatRooms();
   }
 
@@ -74,13 +72,9 @@ class _ChatRoomState extends State<ChatRoom> {
           GestureDetector(
             onTap: (){
               auth.signOut();
-              HelperFunctions.deleteSharedPreferencesData().then((value) {
-                if(value){
-                  Navigator.pushReplacement(context, MaterialPageRoute(
-                      builder: (context) => const Authenticate()
-                  ));
-                }
-              });
+              Navigator.pushReplacement(context, MaterialPageRoute(
+                  builder: (context) => const Authenticate()
+              ));
             },
             child: Container(
                 child: const Icon(Icons.exit_to_app,),
