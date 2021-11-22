@@ -29,6 +29,7 @@ class _MyAppState extends State<MyApp> {
 
   getLoggedInUser() async{
     user = await FirebaseAuth.instance.currentUser;
+    print(user);
   }
 
   @override
@@ -40,7 +41,7 @@ class _MyAppState extends State<MyApp> {
         primaryColor: primaryColor,
         scaffoldBackgroundColor: scaffoldBackground,
       ),
-      home: user!=null ? const ChatRoom() : const Authenticate(),
+      home: Authenticate().getLoggedInUser(context),
     );
   }
 }

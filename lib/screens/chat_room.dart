@@ -1,6 +1,7 @@
 import 'package:chat_application/helper/authenticate.dart';
 import 'package:chat_application/helper/constants.dart';
 import 'package:chat_application/screens/chat.dart';
+import 'package:chat_application/screens/login_screen.dart';
 import 'package:chat_application/screens/search.dart';
 import 'package:chat_application/services/auth.dart';
 import 'package:chat_application/services/database.dart';
@@ -73,7 +74,7 @@ class _ChatRoomState extends State<ChatRoom> {
             onTap: (){
               auth.signOut();
               Navigator.pushReplacement(context, MaterialPageRoute(
-                  builder: (context) => const Authenticate()
+                  builder: (context) => LoginScreen()
               ));
             },
             child: Container(

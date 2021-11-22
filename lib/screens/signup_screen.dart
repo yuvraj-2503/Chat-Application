@@ -8,8 +8,7 @@ import 'package:flutter/material.dart';
 import 'login_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
-  final Function toggleView;
-  const SignUpScreen (this.toggleView ,{Key? key}) : super(key: key);
+  const SignUpScreen ({Key? key}) : super(key: key);
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -176,7 +175,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   GestureDetector(
                     onTap: (){
                       Navigator.pushReplacement(context, MaterialPageRoute(
-                          builder: (context) => LoginScreen(widget.toggleView)
+                          builder: (context) => LoginScreen()
                       ));
                     },
                     child: const Text('Login', style: TextStyle(
